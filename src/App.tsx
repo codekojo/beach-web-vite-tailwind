@@ -28,7 +28,7 @@ const todoData = [
   },
 ];
 function App() {
-  const to100 = [...new Array(101)];
+  const to100 = [...new Array(20)];
   const [dataArray, setDataArray] = useState(todoData);
   const [text, setText] = useState("");
   const [qtyValue, setQtyValue] = useState(1);
@@ -56,6 +56,20 @@ function App() {
   function handleQtyChange(e) {
     setQtyValue(e.target.value);
   }
+
+  //handleListChecked
+  function handleListChecked(id) {
+    setDataArray((prevValue) =>
+      prevValue.map((item) =>
+        item.id === id ? { ...item, checked: !item.checked } : item
+      )
+    );
+  }
+
+  function handleRemoveList(id) {
+    setDataArray((prevValue) => prevValue.filter((item) => item.id !== id));
+  }
+
   return (
     <section className="h-full w-full">
       <div className="text-center h-full grid grid-cols-1 grid-rows-[150px_100px_1fr]">
@@ -105,7 +119,13 @@ function App() {
         <div className="bg-[#4d3524] grid w-full">
           <div className="max-w-4xl w-full mx-auto grid sm:grid-cols-2 md:grid-cols-4 auto-rows-min gap-2 p-3">
             {dataArray.map((data) => {
-              return <Details {...data} />;
+              return (
+                <Details
+                  data={data}
+                  handleChange={handleListChecked}
+                  handleRemove={handleRemoveList}
+                />
+              );
             })}
           </div>
           <div className="mt-auto">
@@ -128,14 +148,28 @@ function App() {
 
 export default App;
 
-const Details = ({ id, name, qty, checked }) => {
+const Details = ({
+  data: { id, name, qty, checked },
+  handleChange,
+  handleRemove,
+}) => {
   return (
     <div className="flex items-center justify-center" key={id}>
-      <div className="flex-1 space-x-2 items-center line-through">
-        <input type="checkbox" id="scales" name="scales" checked={checked} />
-        <label htmlFor="scales">{`${qty} ${name}`}</label>
+      <div
+        className={`flex-1 space-x-2 items-center ${checked && `line-through`}`}
+      >
+        <input
+          type="checkbox"
+          id={id}
+          name={name}
+          checked={checked}
+          onClick={() => handleChange(id)}
+        />
+        <label htmlFor={id}>{`${qty} ${name}`}</label>
       </div>
-      <button className="text-red-500">&#x2715;</button>
+      <button className="text-red-500" onClick={() => handleRemove(id)}>
+        &#x2715;
+      </button>
     </div>
   );
 };
